@@ -37,15 +37,17 @@ const Index = () => {
       ))}
       
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-6 mb-8 h-[400px] overflow-y-auto">
+      <div className="container mx-auto px-4 py-8 relative z-10 flex flex-col min-h-screen">
+        <div className="max-w-2xl mx-auto w-full">
+          {/* Chat Box */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-6 mb-12 h-[400px] overflow-y-auto">
             {messages.map((msg, i) => (
               <ChatMessage key={i} message={msg.text} isUser={msg.isUser} />
             ))}
           </div>
           
-          <div className="flex flex-col items-center gap-8">
+          {/* Input and Conch Section */}
+          <div className="flex flex-col items-center gap-6">
             <input
               type="text"
               value={input}
@@ -55,7 +57,9 @@ const Index = () => {
               className="w-full px-4 py-2 rounded-lg bg-white/90 backdrop-blur-sm font-fredoka focus:outline-none focus:ring-2 focus:ring-shell-primary"
             />
             
-            <MagicConch onPull={handleSubmit} />
+            <div className="mt-4">
+              <MagicConch onPull={handleSubmit} />
+            </div>
           </div>
         </div>
       </div>
