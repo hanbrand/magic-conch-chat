@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useSpring, useMotionValue, useTransform, MotionValue } from 'framer-motion';
 import conchImage from '../images/magic_conch.png';
 
 interface MagicConchProps {
@@ -27,8 +27,8 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
 
   // Calculate the string path - using custom transform function to create straight line
   const stringPath = useTransform(
-    [springX, springY],
-    ([x, y]) => {
+    [springX, springY] as const,
+    ([x, y]: [number, number]) => {
       // If not pulling and at rest, don't show string
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
@@ -41,33 +41,29 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   
   // Add string highlight for a subtle 3D effect
   const stringHighlight = useTransform(
-    [springX, springY],
-    ([x, y]) => {
+    [springX, springY] as const,
+    ([x, y]: [number, number]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
       // Create a subtle highlight line with a slight offset
       const offset = 0.5;
-      const offsetX = typeof x === 'number' ? x - offset : 0;
-      const offsetY = typeof y === 'number' ? y - offset : 0;
-      return `M 0,0 L ${offsetX},${offsetY}`;
+      return `M 0,0 L ${x - offset},${y - offset}`;
     }
   );
   
   // Add string shadow for depth
   const stringShadow = useTransform(
-    [springX, springY],
-    ([x, y]) => {
+    [springX, springY] as const,
+    ([x, y]: [number, number]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
       // Create a subtle shadow line with a slight offset
       const offset = 0.5;
-      const offsetX = typeof x === 'number' ? x + offset : 0;
-      const offsetY = typeof y === 'number' ? y + offset : 0;
-      return `M 0,0 L ${offsetX},${offsetY}`;
+      return `M 0,0 L ${x + offset},${y + offset}`;
     }
   );
 
