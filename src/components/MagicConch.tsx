@@ -26,9 +26,15 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   const springY = useSpring(pullY, springConfig);
 
   // Calculate the string curve - using a more natural quadratic bezier
-  const stringPath = useTransform<[MotionValue<number>, MotionValue<number>], string>(
-    [springX, springY],
-    ([latestX, latestY]) => {
+  const stringPath = useTransform<number, string>(
+    // Pass an array of motion values as the first argument
+    [springX, springY] as unknown as MotionValue<number>,
+    // The function to transform the values
+    (latest: number[]) => {
+      // Extract x and y from the array
+      const latestX = latest[0];
+      const latestY = latest[1];
+      
       // If not pulling and at rest, don't show string
       if (!isPulling && Math.abs(latestX) < 0.1 && Math.abs(latestY) < 0.1) {
         return 'M 0,0 L 0,0';
@@ -55,9 +61,12 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   );
   
   // Add string highlights and shadows for depth
-  const stringHighlight = useTransform<[MotionValue<number>, MotionValue<number>], string>(
-    [springX, springY], 
-    ([x, y]) => {
+  const stringHighlight = useTransform<number, string>(
+    [springX, springY] as unknown as MotionValue<number>, 
+    (latest: number[]) => {
+      const x = latest[0];
+      const y = latest[1];
+      
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
@@ -76,9 +85,12 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
     }
   );
   
-  const stringShadow = useTransform<[MotionValue<number>, MotionValue<number>], string>(
-    [springX, springY], 
-    ([x, y]) => {
+  const stringShadow = useTransform<number, string>(
+    [springX, springY] as unknown as MotionValue<number>, 
+    (latest: number[]) => {
+      const x = latest[0];
+      const y = latest[1];
+      
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
