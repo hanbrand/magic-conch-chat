@@ -105,12 +105,12 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
       <div className="absolute left-[76%] top-[38%] w-0 h-0">
         {/* Container for both string SVG and draggable handle */}
         <div className="relative">
-          {/* String Visualization - Position the SVG origin at the center of the drag handle */}
+          {/* String Visualization - SVG positioned precisely with the handle's center */}
           <svg
             width="120"
             height="120"
             viewBox="-60 -60 120 120"
-            className="absolute"
+            className="absolute top-0 left-0"
             style={{ pointerEvents: 'none' }}
           >
             <defs>
@@ -162,9 +162,9 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
             />
           </svg>
           
-          {/* Draggable Pull Handle - Now aligned with the SVG origin */}
+          {/* Draggable Pull Handle - positioned exactly at SVG center (0,0) */}
           <motion.div
-            className="absolute top-[-2.5px] left-[-2.5px] cursor-grab active:cursor-grabbing"
+            className="absolute w-5 h-5 top-[-10px] left-[-10px] cursor-grab active:cursor-grabbing"
             drag
             dragConstraints={{
               top: -60,
@@ -188,9 +188,9 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
             }}
           >
             {/* Pull Knob */}
-            <div className="relative">
+            <div className="relative w-5 h-5">
               {/* Main knob */}
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-yellow-100 to-yellow-300 shadow-md border border-yellow-400">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-yellow-100 to-yellow-300 shadow-md border border-yellow-400">
                 {/* Inner detail */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600" />
               </div>
