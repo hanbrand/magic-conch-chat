@@ -26,83 +26,44 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   const springY = useSpring(pullY, springConfig);
 
   // Calculate the string curve
-  const stringPath = useTransform(
-    // Pass an array of motion values
-    [springX, springY] as any,
-    // The transform function
-    ([x, y]: number[]) => {
+  const stringPath = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+    [springX, springY],
+    ([x, y]) => {
       // If not pulling and at rest, don't show string
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
 
-      // Calculate the pull length for tension effect
-      const pullLength = Math.sqrt(x * x + y * y);
-      const tensionFactor = Math.min(pullLength * 0.02, 0.8);
-      
-      // Start at the anchor point (0,0) where the string connects to the conch
-      const startX = 0;
-      const startY = 0;
-      
-      // Create control points for a natural curve
-      // We want the curve to sag slightly downward for realism
-      const cp1x = startX + x * 0.3;
-      const cp1y = startY + y * 0.3 + (pullLength * 0.1); // Add a bit of downward sag
-      const cp2x = startX + x * 0.7;
-      const cp2y = startY + y * 0.7 + (pullLength * 0.05); // Less sag near the end
-      
-      // Return a cubic Bezier curve for natural string movement
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x},${y}`;
+      // Create a simple straight line from origin (0,0) to the current handle position (x,y)
+      return `M 0,0 L ${x},${y}`;
     }
   );
   
-  // Add string highlight for a more 3D effect
-  const stringHighlight = useTransform(
-    [springX, springY] as any,
-    ([x, y]: number[]) => {
+  // Add string highlight for a subtle 3D effect
+  const stringHighlight = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+    [springX, springY],
+    ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
-      const pullLength = Math.sqrt(x * x + y * y);
-      
-      // Slight offset for highlight effect
-      const offset = 0.7;
-      const startX = -offset;
-      const startY = -offset;
-      
-      // Control points with similar curve but slight offset
-      const cp1x = startX + x * 0.3;
-      const cp1y = startY + y * 0.3 + (pullLength * 0.1);
-      const cp2x = startX + x * 0.7;
-      const cp2y = startY + y * 0.7 + (pullLength * 0.05);
-      
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x-offset},${y-offset}`;
+      // Create a subtle highlight line with a slight offset
+      const offset = 0.5;
+      return `M 0,0 L ${x-offset},${y-offset}`;
     }
   );
   
   // Add string shadow for depth
-  const stringShadow = useTransform(
-    [springX, springY] as any,
-    ([x, y]: number[]) => {
+  const stringShadow = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+    [springX, springY],
+    ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
-      const pullLength = Math.sqrt(x * x + y * y);
-      
-      // Slight offset for shadow effect
-      const offset = 0.7;
-      const startX = offset;
-      const startY = offset;
-      
-      // Control points with similar curve but slight offset
-      const cp1x = startX + x * 0.3;
-      const cp1y = startY + y * 0.3 + (pullLength * 0.1);
-      const cp2x = startX + x * 0.7;
-      const cp2y = startY + y * 0.7 + (pullLength * 0.05);
-      
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x+offset},${y+offset}`;
+      // Create a subtle shadow line with a slight offset
+      const offset = 0.5;
+      return `M 0,0 L ${x+offset},${y+offset}`;
     }
   );
 
@@ -140,7 +101,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
         className="w-64 h-auto"
       />
       
-      {/* String Connection Point - Adjust position to better match the conch shell */}
+      {/* String Connection Point - Position this div for the string origin */}
       <div className="absolute left-[76%] top-[38%] w-1 h-1">
         {/* String Visualization */}
         <svg
@@ -199,7 +160,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
           />
         </svg>
         
-        {/* Draggable Pull Handle */}
+        {/* Draggable Pull Handle - This needs to be in the same container as the SVG */}
         <motion.div
           className="absolute top-0 left-0 cursor-grab active:cursor-grabbing"
           drag
