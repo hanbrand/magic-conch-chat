@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useSpring, useMotionValue, useTransform, MotionValue } from 'framer-motion';
 import conchImage from '../images/magic_conch.png';
 
 interface MagicConchProps {
@@ -26,7 +26,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   const springY = useSpring(pullY, springConfig);
 
   // Calculate the string curve - using a more natural quadratic bezier
-  const stringPath = useTransform(
+  const stringPath = useTransform<[MotionValue<number>, MotionValue<number>], string>(
     [springX, springY],
     ([latestX, latestY]) => {
       // If not pulling and at rest, don't show string
@@ -55,7 +55,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   );
   
   // Add string highlights and shadows for depth
-  const stringHighlight = useTransform(
+  const stringHighlight = useTransform<[MotionValue<number>, MotionValue<number>], string>(
     [springX, springY], 
     ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
@@ -76,7 +76,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
     }
   );
   
-  const stringShadow = useTransform(
+  const stringShadow = useTransform<[MotionValue<number>, MotionValue<number>], string>(
     [springX, springY], 
     ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
