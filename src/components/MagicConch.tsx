@@ -16,96 +16,93 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   
   // Create natural spring physics for the handle
   const springConfig = {
-    stiffness: 300,  // Less stiff for more elasticity
-    damping: 20,     // Less damping for more bounce
-    mass: 0.8,       // More mass for more momentum
-    restDelta: 0.1   // More precise rest position
+    stiffness: 300,
+    damping: 20,
+    mass: 0.8,
+    restDelta: 0.1
   };
   
   const springX = useSpring(pullX, springConfig);
   const springY = useSpring(pullY, springConfig);
 
-  // Calculate the string curve - using a more natural quadratic bezier
-  const stringPath = useTransform<number, string>(
-    // Pass an array of motion values as the first argument
-    [springX, springY] as unknown as MotionValue<number>,
-    // The function to transform the values
-    (latest: number[]) => {
-      // Extract x and y from the array
-      const latestX = latest[0];
-      const latestY = latest[1];
-      
+  // Calculate the string curve
+  const stringPath = useTransform(
+    // Pass an array of motion values
+    [springX, springY] as any,
+    // The transform function
+    ([x, y]: number[]) => {
       // If not pulling and at rest, don't show string
-      if (!isPulling && Math.abs(latestX) < 0.1 && Math.abs(latestY) < 0.1) {
+      if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
 
-      // Calculate the length of the pull for tension
-      const pullLength = Math.sqrt(latestX * latestX + latestY * latestY);
+      // Calculate the pull length for tension effect
+      const pullLength = Math.sqrt(x * x + y * y);
       const tensionFactor = Math.min(pullLength * 0.02, 0.8);
       
-      // String anchor point
+      // Start at the anchor point (0,0) where the string connects to the conch
       const startX = 0;
       const startY = 0;
       
-      // Control points for a natural curve
-      // The tension affects how much the curve bends
-      const cp1x = startX + latestX * 0.25;
-      const cp1y = startY + latestY * 0.15 - (pullLength * tensionFactor);
-      const cp2x = startX + latestX * 0.75;
-      const cp2y = startY + latestY * 0.85 - (pullLength * tensionFactor * 0.5);
+      // Create control points for a natural curve
+      // We want the curve to sag slightly downward for realism
+      const cp1x = startX + x * 0.3;
+      const cp1y = startY + y * 0.3 + (pullLength * 0.1); // Add a bit of downward sag
+      const cp2x = startX + x * 0.7;
+      const cp2y = startY + y * 0.7 + (pullLength * 0.05); // Less sag near the end
       
-      // Create a cubic Bezier curve for more natural string movement
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${latestX},${latestY}`;
+      // Return a cubic Bezier curve for natural string movement
+      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x},${y}`;
     }
   );
   
-  // Add string highlights and shadows for depth
-  const stringHighlight = useTransform<number, string>(
-    [springX, springY] as unknown as MotionValue<number>, 
-    (latest: number[]) => {
-      const x = latest[0];
-      const y = latest[1];
-      
+  // Add string highlight for a more 3D effect
+  const stringHighlight = useTransform(
+    [springX, springY] as any,
+    ([x, y]: number[]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
       const pullLength = Math.sqrt(x * x + y * y);
-      const tensionFactor = Math.min(pullLength * 0.02, 0.8);
       
-      const startX = -0.5;
-      const startY = -0.5;
-      const cp1x = startX + x * 0.25 - 0.5;
-      const cp1y = startY + y * 0.15 - (pullLength * tensionFactor) - 0.5;
-      const cp2x = startX + x * 0.75 - 0.5;
-      const cp2y = startY + y * 0.85 - (pullLength * tensionFactor * 0.5) - 0.5;
+      // Slight offset for highlight effect
+      const offset = 0.7;
+      const startX = -offset;
+      const startY = -offset;
       
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x-0.5},${y-0.5}`;
+      // Control points with similar curve but slight offset
+      const cp1x = startX + x * 0.3;
+      const cp1y = startY + y * 0.3 + (pullLength * 0.1);
+      const cp2x = startX + x * 0.7;
+      const cp2y = startY + y * 0.7 + (pullLength * 0.05);
+      
+      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x-offset},${y-offset}`;
     }
   );
   
-  const stringShadow = useTransform<number, string>(
-    [springX, springY] as unknown as MotionValue<number>, 
-    (latest: number[]) => {
-      const x = latest[0];
-      const y = latest[1];
-      
+  // Add string shadow for depth
+  const stringShadow = useTransform(
+    [springX, springY] as any,
+    ([x, y]: number[]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
         return 'M 0,0 L 0,0';
       }
       
       const pullLength = Math.sqrt(x * x + y * y);
-      const tensionFactor = Math.min(pullLength * 0.02, 0.8);
       
-      const startX = 0.5;
-      const startY = 0.5;
-      const cp1x = startX + x * 0.25 + 0.5;
-      const cp1y = startY + y * 0.15 - (pullLength * tensionFactor) + 0.5;
-      const cp2x = startX + x * 0.75 + 0.5;
-      const cp2y = startY + y * 0.85 - (pullLength * tensionFactor * 0.5) + 0.5;
+      // Slight offset for shadow effect
+      const offset = 0.7;
+      const startX = offset;
+      const startY = offset;
       
-      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x+0.5},${y+0.5}`;
+      // Control points with similar curve but slight offset
+      const cp1x = startX + x * 0.3;
+      const cp1y = startY + y * 0.3 + (pullLength * 0.1);
+      const cp2x = startX + x * 0.7;
+      const cp2y = startY + y * 0.7 + (pullLength * 0.05);
+      
+      return `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x+offset},${y+offset}`;
     }
   );
 
@@ -143,7 +140,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
         className="w-64 h-auto"
       />
       
-      {/* String Connection Point */}
+      {/* String Connection Point - Adjust position to better match the conch shell */}
       <div className="absolute left-[76%] top-[38%] w-1 h-1">
         {/* String Visualization */}
         <svg
