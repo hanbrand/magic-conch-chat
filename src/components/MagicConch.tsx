@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { motion, useSpring, useMotionValue, useTransform, MotionValue } from 'framer-motion';
+import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
 import conchImage from '../images/magic_conch.png';
 
 interface MagicConchProps {
@@ -25,8 +25,8 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   const springX = useSpring(pullX, springConfig);
   const springY = useSpring(pullY, springConfig);
 
-  // Calculate the string curve
-  const stringPath = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+  // Calculate the string path - using custom transform function to create straight line
+  const stringPath = useTransform(
     [springX, springY],
     ([x, y]) => {
       // If not pulling and at rest, don't show string
@@ -40,7 +40,7 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
   );
   
   // Add string highlight for a subtle 3D effect
-  const stringHighlight = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+  const stringHighlight = useTransform(
     [springX, springY],
     ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
@@ -49,12 +49,14 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
       
       // Create a subtle highlight line with a slight offset
       const offset = 0.5;
-      return `M 0,0 L ${x-offset},${y-offset}`;
+      const offsetX = typeof x === 'number' ? x - offset : 0;
+      const offsetY = typeof y === 'number' ? y - offset : 0;
+      return `M 0,0 L ${offsetX},${offsetY}`;
     }
   );
   
   // Add string shadow for depth
-  const stringShadow = useTransform<[MotionValue<number>, MotionValue<number>], string>(
+  const stringShadow = useTransform(
     [springX, springY],
     ([x, y]) => {
       if (!isPulling && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
@@ -63,7 +65,9 @@ export const MagicConch: React.FC<MagicConchProps> = ({ onPull }) => {
       
       // Create a subtle shadow line with a slight offset
       const offset = 0.5;
-      return `M 0,0 L ${x+offset},${y+offset}`;
+      const offsetX = typeof x === 'number' ? x + offset : 0;
+      const offsetY = typeof y === 'number' ? y + offset : 0;
+      return `M 0,0 L ${offsetX},${offsetY}`;
     }
   );
 
